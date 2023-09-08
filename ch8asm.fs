@@ -36,6 +36,7 @@ $F2 CONSTANT DT
 
 ( 4KB Chip8 core memory)
 create ch8mem $1000 allot
+ch8mem $1000 erase
 
 ( Alias definitions for Forth "AND", "OR" and "XOR" )
 ' AND ALIAS $AND
@@ -191,3 +192,12 @@ $200 ORG
 ( Set VX equal to the bitwise xor of the values in VX and VY )
 : XOR ( vy vx -- )
   (8cmd) $8003 OR ORG! ;
+
+( create label for jumps )
+: label:
+  CREATE 'org @ ,
+  DOES> @ ;
+
+( save binary image )
+: savebin ( <name> )
+  ch8mem $1000 savefile ;
