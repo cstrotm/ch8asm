@@ -206,4 +206,6 @@ $200 ORG
 
 ( save binary image )
 : savebin ( <name> )
-  ch8mem maxmem @ savefile ;
+  ." Saving binary ..." CR
+  ch8mem maxmem @ savefile
+  maxmem @ . ." bytes saved." CR ;
