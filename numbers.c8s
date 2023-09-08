@@ -1,3 +1,6 @@
+( Example Chip-8 Source code )
+( Adapted from example at https://github.com/nnarain/silica )
+
 $200 ORG
 
 LABEL: start
