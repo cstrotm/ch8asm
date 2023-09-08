@@ -51,3 +51,6 @@ LABEL: num4
   %11110000 DB
   %00010000 DB
   %11110000 DB
+
+( save binary )
+savebin numbers.ch8
