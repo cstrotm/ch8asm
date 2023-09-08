@@ -75,7 +75,7 @@ $200 ORG
 ( Store memnonic in current org memory address )
 : ORG! ( n -- )
   'ORG @ ch8mem + !
-  2 + $0FFF AND 'ORG !
+  'ORG @ 2 + $0FFF AND 'ORG !
   'ORG @ maxmem @ > IF 'ORG @ maxmem ! THEN
 ;
 
@@ -185,6 +185,55 @@ $200 ORG
   (8cmd) SWAP $000F AND OR
   $D000 OORG! ;
 
+( Prepare for E/F commands using VX as parameter )
+: (vxcmd)
+  $000F AND >< ;
+
+( Skip the following instruction if the key represented by the )
+(  value in VX is pressed.)
+: SKP ( vx -- )
+  (vxcmd) $E09E OORG! ;
+
+( Set VX equal to the delay timer. )
+: LDT ( vx -- )
+  (vxcmd) $F007 OORG! ;
+
+( Wait for a key press and store the value of the key into VX. )
+: LKY ( vx -- )
+  (vxcmd) $F00A OORG! ;
+
+( Set the delay timer DT to VX. )
+: SDT ( vx -- )
+  (vxcmd) $F015 OORG! ;
+
+( Set the sound timer ST to VX. )
+: SST ( vx -- )
+  (vxcmd) $F018 OORG! ;
+
+( Add VX to I. VF is set to 1 if I > 0x0FFF. Otherwise set to 0. )
+: AVI ( vx -- )
+  (vxcmd) $F01E OORG! ;
+
+( Set I to the address of the CHIP-8 8x5 font sprite representing )
+( the value in VX. )
+: LDF ( vx -- )
+  (vxcmd) $F029 OORG! ;
+
+( Convert that word to BCD and store the 3 digits at memory location )
+( I through I+2. I does not change. )
+: BCD
+  (vxcmd) $F033 OORG! ;
+
+( Store registers V0 through VX in memory starting at location I. )
+( I does not change )
+: STR ( vx -- )
+  (vxcmd) $F055 OORG! ;
+
+( Copy values from memory location I through I + X into registers )
+( V0 through VX. I does not change. )
+: LDR ( vx -- )
+  (vxcmd) $F065 OORG! ;
+
 ( Set VX equal to the bitwise or of the values in VX and VY )
 : ORR ( vy vx -- )
   (8cmd) $8001 OORG! ;
@@ -200,7 +249,7 @@ $200 ORG
 ( store singe bytes in memory )
 : DB ( n -- )
   'ORG @ ch8mem + C!
-  1 + $0FFF AND 'ORG !
+  'ORG @ 1 + $0FFF AND 'ORG !
   'ORG @ maxmem @ > IF 'ORG @ maxmem ! THEN
 
 ( create label for jumps )
