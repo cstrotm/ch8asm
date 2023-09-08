@@ -5,6 +5,7 @@
 
 .( Chip 8 Assembler ) CR
 
+hex
 forget marker
 create marker
 vocabulary ch8asm
@@ -27,12 +28,6 @@ $0C CONSTANT VC
 $0D CONSTANT VD
 $0E CONSTANT VE
 $0F CONSTANT VF
-( Index Register )
-$FF CONSTANT IR
-( Sound Timer )
-$F1 CONSTANT ST
-( Delay Timer )
-$F2 CONSTANT DT
 
 ( 4KB Chip8 core memory)
 create ch8mem $1000 allot
@@ -201,7 +196,7 @@ $200 ORG
 
 ( create label for jumps )
 : label:
-  CREATE 'org @ ,
+  CREATE 'ORG @ ,
   DOES> @ ;
 
 ( save binary image )
