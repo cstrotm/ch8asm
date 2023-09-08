@@ -38,6 +38,9 @@ $F2 CONSTANT DT
 create ch8mem $1000 allot
 ch8mem $1000 erase
 
+( highest memory address used )
+VARIABLE maxmem 0 maxmem !
+
 ( Alias definitions for Forth "AND", "OR" and "XOR" )
 ' AND ALIAS $AND
 ' XOR ALIAS $XOR
@@ -76,7 +79,10 @@ $200 ORG
 
 ( Store memnonic in current org memory address )
 : ORG! ( n -- )
-  'ORG @ ch8mem + ! 2 'ORG +! ;
+  'ORG @ ch8mem + !
+  2 + $0FFF AND 'ORG !
+  'ORG @ maxmem @ > IF 'ORG @ maxmem ! THEN
+;
 
 ( CLS memnonic - clear screen )
 : CLS $00E0 ORG! ;
@@ -200,4 +206,4 @@ $200 ORG
 
 ( save binary image )
 : savebin ( <name> )
-  ch8mem $1000 savefile ;
+  ch8mem maxmem @ savefile ;
