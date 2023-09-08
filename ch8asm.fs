@@ -197,6 +197,12 @@ $200 ORG
 : XOR ( vy vx -- )
   (8cmd) $8003 OORG! ;
 
+( store singe bytes in memory )
+: DB ( n -- )
+  'ORG @ ch8mem + C!
+  1 + $0FFF AND 'ORG !
+  'ORG @ maxmem @ > IF 'ORG @ maxmem ! THEN
+
 ( create label for jumps )
 : label:
   CREATE 'ORG @ ,
