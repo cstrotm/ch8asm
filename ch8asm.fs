@@ -3,12 +3,12 @@
 ( Command definitions from https://github.com/trapexit/chip-8_documentation )
 ( Licensed under GPL3 or later )
 
-.( Chip 8 Assembler )
+.( Chip 8 Assembler ) CR
 
 forget marker
 create marker
 vocabulary ch8asm
-ch8asm definitions
+onlyforth ch8asm also definitions
 
 ( Chip 8 register definitions )
 $00 CONSTANT V0
@@ -36,6 +36,11 @@ $F2 CONSTANT DT
 
 ( 4KB Chip8 core memory)
 create ch8mem $1000 allot
+
+( Alias definitions for Forth "AND", "OR" and "XOR" )
+' AND ALIAS $AND
+' XOR ALIAS $XOR
+' OR  ALIAS $OR
 
 : Dump ( adr n -- )
   SWAP $0FFF AND SWAP
@@ -120,18 +125,6 @@ $200 ORG
 : CPR ( vy vx -- )
   (8cmd) $8000 OR ORG! ;
 
-( Set VX equal to the bitwise or of the values in VX and VY )
-: ORR ( vy vx -- )
-  (8cmd) $8001 OR ORG! ;
-
-( Set VX equal to the bitwise and of the values in VX and VY )
-: AND ( vy vx -- )
-  (8cmd) $8002 OR ORG! ;
-
-( Set VX equal to the bitwise xor of the values in VX and VY )
-: XOR ( vy vx -- )
-  (8cmd) $8003 OR ORG! ;
-
 ( Set VX equal to VX plus VY. In the case of an overflow )
 ( VF is set to 1. Otherwise 0. )
 : ADD ( vy vx -- )
@@ -186,3 +179,15 @@ $200 ORG
 : DRW ( n vy vx -- )
   (8cmd) SWAP $000F AND OR
   $D000 OR ORG! ;
+
+( Set VX equal to the bitwise or of the values in VX and VY )
+: ORR ( vy vx -- )
+  (8cmd) $8001 OR ORG! ;
+
+( Set VX equal to the bitwise and of the values in VX and VY )
+: AND ( vy vx -- )
+  (8cmd) $8002 OR ORG! ;
+
+( Set VX equal to the bitwise xor of the values in VX and VY )
+: XOR ( vy vx -- )
+  (8cmd) $8003 OR ORG! ;
