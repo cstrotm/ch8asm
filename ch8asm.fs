@@ -121,49 +121,49 @@ $200 ORG
   $00FF AND SWAP $00FF AND >< OR
   $7000 OORG! ;
 
-( Adjust parameter for all of the commands starting with $8 )
- : (8cmd) ( vx vy -- )
+( Adjust parameter for all of the commands using VX and VY as input )
+ : (vxycmd) ( vx vy -- )
   $00FF AND >< SWAP $00FF AND
   4 lshift OR ;
 
 ( Copy register vy into vx )
 : CPR ( vy vx -- )
-  (8cmd) $8000 OORG! ;
+  (vxycmd) $8000 OORG! ;
 
 ( Set VX equal to VX plus VY. In the case of an overflow )
 ( VF is set to 1. Otherwise 0. )
 : ADD ( vy vx -- )
-  (8cmd) $8004 OORG! ;
+  (vxycmd) $8004 OORG! ;
 
 ( Set VX equal to VX minus VY. In the case of an underflow )
 ( VF is set 0. Otherwise 1.  VF = VX > VY )
 : SUB ( vy vx -- )
-  (8cmd) $8005 OORG! ;
+  (vxycmd) $8005 OORG! ;
 
 ( Set VX equal to VX bitshifted right 1. VF is set to the least )
 ( significant bit of VX prior to the shift. Originally this opcode )
 ( meant set VX equal to VY bitshifted right 1 but emulators and software )
 ( seem to ignore VY now. )
 : SHRV ( vy vx -- )
-  (8cmd) $8006 OORG! ;
+  (vxycmd) $8006 OORG! ;
 : SHR ( vx -- )
   V0 SWAP SHRV ;
 
 ( Set VX equal to VY minus VX. VF is set to 1 if VY > VX. Otherwise 0 )
 : SBR ( vy vx -- )
-  (8cmd) $8007 OORG! ;
+  (vxycmd) $8007 OORG! ;
 
 ( Set VX equal to VX bitshifted left 1. VF is set to the most significant )
 ( bit of VX prior to the shift. Originally this opcode meant set VX equal )
 ( to VY bitshifted left 1 but emulators and software seem to ignore VY now )
 : SHLV ( vy vx -- )
-  (8cmd) $800E OORG! ;
+  (vxycmd) $800E OORG! ;
 : SHL ( vx -- )
   V0 SWAP SHLV ;
 
 ( Skip the next instruction if VX does not equal VY )
 : SNEV ( vy vx -- )
-  (8cmd) $9000 OORG! ;
+  (vxycmd) $9000 OORG! ;
 
 ( Set I equal to NNN )
 : LDI ( NNN -- )
@@ -182,7 +182,7 @@ $200 ORG
 ( Each set bit of xored with what's already drawn. VF is set to  )
 ( 1 if a collision occurs. 0 otherwise. )
 : DRW ( n vy vx -- )
-  (8cmd) SWAP $000F AND OR
+  (vxycmd) SWAP $000F AND OR
   $D000 OORG! ;
 
 ( Prepare for E/F commands using VX as parameter )
@@ -236,21 +236,21 @@ $200 ORG
 
 ( Set VX equal to the bitwise or of the values in VX and VY )
 : ORR ( vy vx -- )
-  (8cmd) $8001 OORG! ;
+  (vxycmd) $8001 OORG! ;
 
 ( Set VX equal to the bitwise and of the values in VX and VY )
 : AND ( vy vx -- )
-  (8cmd) $8002 OORG! ;
+  (vxycmd) $8002 OORG! ;
 
 ( Set VX equal to the bitwise xor of the values in VX and VY )
 : XOR ( vy vx -- )
-  (8cmd) $8003 OORG! ;
+  (vxycmd) $8003 OORG! ;
 
 ( store singe bytes in memory )
 : DB ( n -- )
   'ORG @ ch8mem + C!
   'ORG @ 1 + $0FFF AND 'ORG !
-  'ORG @ maxmem @ > IF 'ORG @ maxmem ! THEN
+  'ORG @ maxmem @ > IF 'ORG @ maxmem ! THEN ;
 
 ( create label for jumps )
 : label:
