@@ -1,0 +1,118 @@
+#+Title: CHIP-8 Assembler
+#+Author: Carsten Strotmann
+#+Date: <2023-09-11 Mon>
+
+* Intro
+
+This is an very early version of a CHIP-8 Assembler based on
+VolksForth. The current version is being created for the Atari 8bit,
+but it should be easy be ported to other VolksForth or Forth
+implementations.
+
+* Usage
+
+The CHIP-8 Assembler is started by executing the file =ch8asm.com=. It
+used the commandline interface of VolksForth.
+
+CHIP-8 Assembler code can be entered directly from the keyboard or
+loaded from a file.
+
+To load from a file, enter
+
+ASM <filespec>
+
+The assembled binary code can be saved to file with
+
+SAVEBIN <filespec>
+
+To leave the Assembler to DOS enter the command
+
+DOS
+
+By default, the Assembler starts in HEX mode, all numbers are
+interpreted as hexadecimal numbers. The mode can be switch with the
+commands =decimal= (switched to decimal mode) and =hex= (switched to
+hexadecimal mode)
+
+All numbers can be prefixed to denote the number base:
+
+&100 - a decimal 100
+$100 - a hexadecimal 100
+%100 - a binary 100
+
+* Memnonics
+
+This assembler is using a postfix notation where the parameters of a
+CHIP-8 command are written first, followed by the command itself.
+
+Take a look at the example source code files distributed with this
+software to get a feel for the syntax.
+
+ * =NNN ORG= - Set the assemble address to NNN
+ * =CLS= -  CLS memnonic - clear screen
+ * =RET= -  RET memnonic - return from subroutine
+ * =NNN JMP= - JMP memnonic - jump to address
+ * =NNN JSR= - JSR Memnonic aka CALL - jump to subroutine at address
+ * =VX NN SEQ= - Skip next command if VX is equal to NN
+ * =VX NN SNE= - Skip next command if VX is not equal to NN
+ * =VY VX SRE= - Skip next command if VY is equal to VX
+ * =VX NN LDV= - Load immediate value NN into register VX
+ * =VX NN ADV= - Add immediate value NN to register VX
+ * =VY VX CPR= - Copy register vy into vx
+ * =XY VX ADD= - Set VX equal to VX plus VY. In the case of an overflow,
+   VF is set to 1. Otherwise 0.
+ * =VY VX SUB= - Set VX equal to VX minus VY. In the case of an
+   underflow, VF is set 0. Otherwise 1. VF = VX > VY
+ * =VY VX ORR= - Set VX equal to the bitwise or of the values in VX and VY
+ * =VY VX AND= - Set VX equal to the bitwise and of the values in VX and VY
+ * =VY VX XOR= - Set VX equal to the bitwise xor of the values in VX and VY
+ * =VY VX SHRV=
+ *    =VX SHR= - Set VX equal to VX bitshifted right 1. VF is set to the
+   least significant bit of VX prior to the shift. Originally this
+   opcode meant set VX equal to VY bitshifted right 1 but emulators
+   and software seem to ignore VY now.
+ * =VY VX SBR= - Set VX equal to VY minus VX. VF is set to 1 if VY > VX.
+   Otherwise 0
+ * =VY VX SHLV=
+      =VX SHL= - Set VX equal to VX bitshifted left 1. VF is set to the
+   most significant bit of VX prior to the shift. Originally this
+   opcode meant set VX equal to VY bitshifted left 1 but emulators and
+   software seem to ignore VY now
+ * =VY VX SNEV= - Skip the next instruction if VX does not equal VY
+ * =NNN LDI= - Set I equal to NNN
+ * =NNN JPV= - Set the PC to NNN plus the value in V0
+ * =NN VX RND= - Set VX equal to a random number ranging from 0 to 255
+   which is logically anded with NN
+ * =NN VX VY DRW= - Display N-byte sprite starting at memory location I
+   at VX, VY. Each set bit of xored with what's already drawn. VF is
+   set to 1 if a collision occurs. 0 otherwise.
+ * =VX SKP= - Skip the following instruction if the key represented by
+   the value in VX is pressed.
+ * =VX LDT= - Set VX equal to the delay timer.
+ * =VX LKY= - Wait for a key press and store the value of the key into VX.
+ * =VX SDT= - Set the delay timer DT to VX.
+ * =VX SST= - Set the sound timer ST to VX.
+ * =VX AVI= - Add VX to I. VF is set to 1 if I > 0x0FFF. Otherwise set to 0.
+ * =VX LDF= - Set I to the address of the CHIP-8 8x5 font sprite
+   representing the value in VX.
+ * =VX BCD= - Convert that word to BCD and store the 3 digits at memory
+   location I through I+2. I does not change.
+ * =VX STR= - Store registers V0 through VX in memory starting at
+   location I. I does not change.
+ * =VX LDR= - Copy values from memory location I through I + X into
+   registers V0 through VX. I does not change.
+ * =NN DB=  - store a singe byte in memory
+ * =LABEL: <label>= - create label ( for jumps and sprites )
+
+* Limits
+
+ * Not fully tested, there are bugs
+ * No forward references - labels must be declared before use
+ * Only CHIP-8, no extended CHIP-8 machine support
+ * Assembler must be restarted after an assembly run
+
+* Future development
+
+ * Forward reference label
+ * SCHIP-8 and CHIP-8 extensions support
+ * Debugger/Disassembler
