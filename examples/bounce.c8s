@@ -1,0 +1,80 @@
+( Cube example programm )
+( inspired by cube.asm from )
+( https://github.com/wernsey/chip8 )
+
+
+' V0 ALIAS SPRX ( sprite X,Y position )
+' V1 ALIAS SPRY
+' V2 ALIAS OLDX ( previous sprite X,Y position )
+' V3 ALIAS OLDY
+' V4 ALIAS DIRX ( sprite direction )
+' V5 ALIAS DIRY
+
+$240 ORG
+
+LABEL: SPRITE1
+    %00111000 DB
+    %00111000 DB
+    %01010100 DB
+    %01010100 DB
+    %10010010 DB
+    %10111010 DB
+    %10101010 DB
+
+$200 ORG
+
+( Clear the screen )
+CLS
+
+( load the variables initial values )
+SPRX &10 LDV
+SPRY &10 LDV
+DIRX   1 LDV
+DIRY   1 LDV
+SPRITE1  LDI ( sprite1 )
+6 SPRY SPRX DRW
+
+( The main loop )
+LABEL: LOOP
+( store the current position )
+  SPRX OLDX CPR
+  SPRY OLDY CPR
+( If you reached the left edge of the screen, change direction )
+  SPRX 0   SNE
+  DIRX 1   LDV
+( If you reached the right edge of the screen, change direction )
+  SPRX &56 SNE
+  DIRX -1  LDV
+( If you reached the top edge of the screen, change direction )
+  SPRY 0   SNE
+  DIRY 1   LDV
+( If you reached the bottom edge of the screen, change direction )
+  SPRY &24 SNE
+  DIRY -1  LDV
+
+( add direction to X-posiiton )
+  DIRX SPRX ADD
+( add direction to Y-posiiton )
+  DIRY SPRY ADD
+
+( Draw the box )
+( Load the address of the sprite's graphics into register I )
+  SPRITE1 LDI ( sprite1 )
+
+(  Erase the sprite at the old position )
+  6 OLDY OLDX DRW
+( Draw the sprite at the new position )
+  6 SPRY SPRX DRW
+
+( Synchronize with Timer )
+  VE 5   LDV ( load 5 into VE )
+  VE     SDT ( Set Delay Timer to Value in VE )
+LABEL: DELAY
+  VE     LDT ( Load Delay Timer into VE )
+  VE 0   SEQ ( Skip Jump if VE == 0 )
+  DELAY  JMP ( Loop while DT > 0 )
+
+( Return to the start of the loop )
+LOOP JMP ( Loop  )
+
+LABEL: END

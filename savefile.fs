@@ -1,4 +1,0 @@
-: SAVEFILE ( addr n / <name> -- )
-  FILE" W/O OPEN-FILE DROP
-  WRITE-FILE DROP
-  CLOSE-FILE DROP ;

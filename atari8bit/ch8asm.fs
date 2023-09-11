@@ -2,12 +2,11 @@
 ( 2023 by Carsten Strotmann, psc     )
 ( Command definitions from https://github.com/trapexit/chip-8_documentation )
 ( Licensed under GPL3 or later )
-
+CR
 .( Chip 8 Assembler ) CR
+.( V: 1.0.2 ) CR
 
 hex
-forget marker
-create marker
 vocabulary ch8asm
 ch8asm also definitions
 
@@ -41,28 +40,21 @@ VARIABLE maxmem 0 maxmem !
 ' XOR ALIAS $XOR
 ' OR  ALIAS $OR
 
-: Dump ( adr n -- )
-  SWAP $0FFF AND SWAP
-  OVER + SWAP
-  DO I ch8mem + C@ . LOOP ;
-
 ( lshift - Perform a logical left shift of u bit-places on x1, giving x2. )
 (  Put zeroes into the least significant bits vacated by the shift. )
 (  An ambiguous condition exists if u is greater than or equal to the )
 (  number of bits in a cell. )
 : lshift ( x1 u -- x2 )
   0 ?DO 2* LOOP ;
-
-( rshift - Perform a logical right shift of u bit-places on x1, giving x2. )
-( Put zeroes into the most significant bits vacated by the shift. An )
-( ambiguous condition exists if u is greater than or equal to the number )
-( of bits in a cell. )
-: rshift ( x1 u -- x2 )
-  0 ?DO 2/ LOOP ;
-
+  
 ( Byteswap )
 : ><  ( 16b1 -- 16b2 )
-  dup 8 lshift swap 8 rshift OR ;
+  $80 ! $80 C@ $100 * $81 C@ OR ;
+
+: Dump ( adr n -- )
+  SWAP $0FFF $AND ch8mem + SWAP
+  OVER + SWAP
+  ?DO I C@ U. LOOP ;
 
 ( Assembly address )
 VARIABLE 'ORG
@@ -74,6 +66,7 @@ $200 ORG
 
 ( Store memnonic in current org memory address )
 : ORG! ( n -- )
+  ><   ( Swap bytes -> little to big endian )
   'ORG @ ch8mem + !
   'ORG @ 2 + $0FFF AND 'ORG !
   'ORG @ maxmem @ > IF 'ORG @ maxmem ! THEN
@@ -94,7 +87,7 @@ $200 ORG
 
 ( JSR Memnonic aka CALL - jump to subroutine at address )
 : JSR ( NNN - )
-  $0FFF AND $200 OORG! ;
+  $0FFF AND $2000 OORG! ;
 
 ( Skip if equal aka SE )
 : SEQ ( vx NN - )
@@ -234,6 +227,12 @@ $200 ORG
 : LDR ( vx -- )
   (vxcmd) $F065 OORG! ;
 
+( store singe bytes in memory )
+: DB ( n -- )
+  'ORG @ ch8mem + C!
+  'ORG @ 1+ $0FFF AND 'ORG !
+  'ORG @ maxmem @ > IF 'ORG @ maxmem ! THEN ;
+
 ( Set VX equal to the bitwise or of the values in VX and VY )
 : ORR ( vy vx -- )
   (vxycmd) $8001 OORG! ;
@@ -246,12 +245,6 @@ $200 ORG
 : XOR ( vy vx -- )
   (vxycmd) $8003 OORG! ;
 
-( store singe bytes in memory )
-: DB ( n -- )
-  'ORG @ ch8mem + C!
-  'ORG @ 1 + $0FFF AND 'ORG !
-  'ORG @ maxmem @ > IF 'ORG @ maxmem ! THEN ;
-
 ( create label for jumps )
 : label:
   CREATE 'ORG @ ,
@@ -259,6 +252,20 @@ $200 ORG
 
 ( save binary image )
 : savebin ( <name> )
-  ." Saving binary ..." CR
-  ch8mem maxmem @ savefile
-  maxmem @ . ." bytes saved." CR ;
+  CR ." Saving CHIP-8 binary ..." CR
+  ch8mem $200 + maxmem @ $200 - savefile
+  maxmem @ $200 - . ." bytes saved." CR ;
+
+( Startup banner )
+: banner
+  page
+  CR ." Chip-8 Assembler V:0.1"
+  CR ." (c) 2023 cas/psc"
+  CR ." https://github.com/cstrotm/ch8asm"
+  CR QUIT ;
+  
+' BYE ALIAS DOS
+
+' BANNER IS 'COLD
+SAVE
+SAVE-SYSTEM D:CH8ASM.COM

@@ -1,56 +1,60 @@
 ( Example Chip-8 Source code )
 ( Adapted from example at https://github.com/nnarain/silica )
 
-$200 ORG
+       $230 ORG
 
-LABEL: start
-  num0    LDI
-  0 V0    LDV
-  0 V1    LDV
-  5 V1 V0 DRW
-
-  num1    LDI
-  &10 V0  LDV
-  0   V1  LDV
-  5 V1 V0 DRW
-
-  num2    LDI
-  &20 V0  LDV
-  0   V1  LDV
-  5 V1 V0 DRW
-
-  num3    LDI
-  &30 V0  LDV
-  0   V1  LDV
-  5 V1 V0 DRW
-
-LABEL: end
-  end    JMP ( endless loop )
-
+LABEL: num0
+  %11110000 DB
+  %10010000 DB
+  %10010000 DB
+  %10010000 DB
+  %11110000 DB
 LABEL: num1
-  %11110000 DB
-  %10010000 DB
-  %10010000 DB
-  %10010000 DB
-  %11110000 DB
-LABEL: num2
   %00100000 DB
   %01100000 DB
   %00100000 DB
   %00100000 DB
   %01110000 DB
-LABEL: num3
+LABEL: num2
   %11110000 DB
   %00010000 DB
   %11110000 DB
   %10000000 DB
   %11110000 DB
-LABEL: num4
+LABEL: num3
   %11110000 DB
   %00010000 DB
   %11110000 DB
   %00010000 DB
   %11110000 DB
 
+       $200 ORG
+
+LABEL: start
+          CLS
+  num0    LDI
+  V0 0    LDV
+  V1 0    LDV
+  5 V1 V0 DRW
+
+  num1    LDI
+  V0 &10  LDV
+  V1   0  LDV
+  5 V1 V0 DRW
+
+  num2    LDI
+  V0 &20  LDV
+  V1   0  LDV
+  5 V1 V0 DRW
+
+  num3    LDI
+  V0 &30  LDV
+  V1   0  LDV
+  5 V1 V0 DRW
+
+LABEL: end
+  end    JMP ( endless loop )
+
+
 ( save binary )
-savebin numbers.ch8
+( SAVEBIN D:NUMBERS.CH8 )
