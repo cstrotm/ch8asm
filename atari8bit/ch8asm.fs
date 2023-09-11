@@ -4,7 +4,7 @@
 ( Licensed under GPL3 or later )
 CR
 .( Chip 8 Assembler ) CR
-.( V: 1.0.2 ) CR
+.( V: 0.0.2 ) CR
 
 hex
 vocabulary ch8asm
@@ -29,8 +29,7 @@ $0E CONSTANT VE
 $0F CONSTANT VF
 
 ( 4KB Chip8 core memory)
-create ch8mem $1000 allot
-ch8mem $1000 erase
+variable ch8mem
 
 ( highest memory address used )
 VARIABLE maxmem 0 maxmem !
@@ -46,13 +45,13 @@ VARIABLE maxmem 0 maxmem !
 (  number of bits in a cell. )
 : lshift ( x1 u -- x2 )
   0 ?DO 2* LOOP ;
-  
+
 ( Byteswap )
 : ><  ( 16b1 -- 16b2 )
   $80 ! $80 C@ $100 * $81 C@ OR ;
 
 : Dump ( adr n -- )
-  SWAP $0FFF $AND ch8mem + SWAP
+  SWAP $0FFF $AND ch8mem @ + SWAP
   OVER + SWAP
   ?DO I C@ U. LOOP ;
 
@@ -67,7 +66,7 @@ $200 ORG
 ( Store memnonic in current org memory address )
 : ORG! ( n -- )
   ><   ( Swap bytes -> little to big endian )
-  'ORG @ ch8mem + !
+  'ORG @ ch8mem @ + !
   'ORG @ 2 + $0FFF AND 'ORG !
   'ORG @ maxmem @ > IF 'ORG @ maxmem ! THEN
 ;
@@ -229,7 +228,7 @@ $200 ORG
 
 ( store singe bytes in memory )
 : DB ( n -- )
-  'ORG @ ch8mem + C!
+  'ORG @ ch8mem @ + C!
   'ORG @ 1+ $0FFF AND 'ORG !
   'ORG @ maxmem @ > IF 'ORG @ maxmem ! THEN ;
 
@@ -253,18 +252,23 @@ $200 ORG
 ( save binary image )
 : savebin ( <name> )
   CR ." Saving CHIP-8 binary ..." CR
-  ch8mem $200 + maxmem @ $200 - savefile
+  ch8mem @ $200 + maxmem @ $200 - savefile
   maxmem @ $200 - . ." bytes saved." CR ;
 
 ( Startup banner )
 : banner
+  here ch8mem !
+  $1000 allot
+  ch8mem @ $1000 erase
   page
-  CR ." Chip-8 Assembler V:0.1"
+  CR ." Chip-8 Assembler V:0.2"
   CR ." (c) 2023 cas/psc"
   CR ." https://github.com/cstrotm/ch8asm"
   CR QUIT ;
-  
+
 ' BYE ALIAS DOS
+' INCLUDE" ALIAS ASM
+' PAGE ALIAS CLEAR
 
 ' BANNER IS 'COLD
 SAVE
