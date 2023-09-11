@@ -1,0 +1,40 @@
+( Ramdom example programm )
+
+$220 ORG
+
+LABEL: SPRITE
+    %00111000 DB
+    %00111000 DB
+    %01010100 DB
+    %01010100 DB
+    %10010010 DB
+    %10111010 DB
+    %10101010 DB
+
+$200 ORG
+
+( Clear the screen )
+CLS
+
+( The main loop )
+LABEL: LOOP
+( get random X position )
+  $3F V0 RND
+( get random Y position )
+  $1F V1 RND
+( Load the address of the sprite's graphics into register I )
+  SPRITE LDI
+( Draw the sprite at the new position )
+  6 V1 V0 DRW
+( Synchronize with Timer )
+  VE 5   LDV ( load 5 into VE )
+  VE     SDT ( Set Delay Timer to Value in VE )
+LABEL: DELAY
+  VE     LDT ( Load Delay Timer into VE )
+  VE 0   SEQ ( Skip Jump if VE == 0 )
+  DELAY  JMP ( Loop while DT > 0 )
+
+( Return to the start of the loop )
+LOOP JMP ( Loop  )
+
+LABEL: END
